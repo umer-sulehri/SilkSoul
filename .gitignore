@@ -1,0 +1,8 @@
+.DS_Store
+.env
+.env.local
+.env*.local
+
+# silksoul app artifacts (nested .gitignore also covers these)
+silksoul/.next/
+silksoul/node_modules/
