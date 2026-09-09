@@ -22,15 +22,12 @@ export function StatusBadge({
 }) {
   const palette: Record<string, string> = {
     PENDING: "bg-warning/15 text-on-surface-variant border-warning/30",
-    UNDER_REVIEW: "bg-info/15 text-on-surface-variant border-info/30",
-    ACCEPTED: "bg-success/15 text-on-surface-variant border-success/30",
-    CONFIRMED: "bg-success/15 text-on-surface-variant border-success/30",
+    APPROVED: "bg-success/15 text-on-surface-variant border-success/30",
     PROCESSING: "bg-info/15 text-on-surface-variant border-info/30",
     SHIPPED: "bg-info/15 text-on-surface-variant border-info/30",
     DELIVERED: "bg-success/15 text-on-surface-variant border-success/30",
     REJECTED: "bg-error/15 text-on-error-container border-error/30",
     CANCELLED: "bg-error/15 text-on-error-container border-error/30",
-    RETURNED: "bg-error/15 text-on-error-container border-error/30",
     PUBLISHED: "bg-success/15 text-on-surface-variant border-success/30",
     DRAFT: "bg-outline-variant/40 text-on-surface-variant border-outline-variant",
     ARCHIVED: "bg-outline-variant/40 text-on-surface-variant border-outline-variant",
@@ -38,7 +35,6 @@ export function StatusBadge({
     IN_PROGRESS: "bg-info/15 text-on-surface-variant border-info/30",
     RESOLVED: "bg-success/15 text-on-surface-variant border-success/30",
     CLOSED: "bg-outline-variant/40 text-on-surface-variant border-outline-variant",
-    APPROVED: "bg-success/15 text-on-surface-variant border-success/30",
   };
 
   return (

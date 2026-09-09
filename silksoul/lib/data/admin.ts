@@ -4,9 +4,10 @@ import {
   demoCustomers,
   demoOrders,
   demoQueries,
-  demoReviews,
-  type DemoOrder,
-} from "@/lib/data/demo-admin";
+  demoAdminReviews,
+  demoProducts,
+} from "@/lib/data/demo-store";
+import { type DemoOrder } from "@/lib/data/demo-admin";
 import { sampleProducts, sampleReviews } from "@/lib/data/sample-data";
 import type { OrderStatus, QueryStatus, ReviewStatus } from "@/types";
 
@@ -103,7 +104,7 @@ export async function fetchAdminOrders(options?: {
   search?: string;
 }): Promise<AdminOrder[]> {
   if (!isSupabaseConfigured()) {
-    let rows = demoOrders;
+    let rows = demoOrders();
     if (options?.status) rows = rows.filter((o) => o.status === options.status);
     if (options?.search) {
       const q = options.search.toLowerCase();
@@ -170,7 +171,7 @@ export async function fetchAdminOrder(id: string): Promise<AdminOrder | null> {
 
 export async function fetchAdminQueries(): Promise<AdminQuery[]> {
   if (!isSupabaseConfigured()) {
-    return [...demoQueries].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    return [...demoQueries()].sort((a, b) => b.created_at.localeCompare(a.created_at));
   }
   const supabase = createServiceClient();
   const { data, error } = await supabase
@@ -183,7 +184,7 @@ export async function fetchAdminQueries(): Promise<AdminQuery[]> {
 
 export async function fetchAdminCustomers(): Promise<AdminCustomer[]> {
   if (!isSupabaseConfigured()) {
-    return [...demoCustomers].sort((a, b) => b.created_at.localeCompare(a.created_at));
+    return [...demoCustomers()].sort((a, b) => b.created_at.localeCompare(a.created_at));
   }
   const supabase = createServiceClient();
   const { data, error } = await supabase.from("customers").select("*");
@@ -205,7 +206,7 @@ export async function fetchAdminCustomers(): Promise<AdminCustomer[]> {
 export async function fetchAdminReviews(): Promise<AdminReview[]> {
   if (!isSupabaseConfigured()) {
     const names = new Map(sampleProducts.map((p) => [p.id, p.name]));
-    const demo = demoReviews.map((r) => ({
+    const demo = demoAdminReviews().map((r) => ({
       ...r,
       product_name:
         r.product_name || (names.get(r.product_id) ?? "Unknown product"),
@@ -227,14 +228,14 @@ export async function fetchAdminReviews(): Promise<AdminReview[]> {
   const supabase = createServiceClient();
   const { data, error } = await supabase
     .from("reviews")
-    .select("id, product_id, customer_name, rating, title, comment, status, created_at, products(name)")
+    .select("id, product_id, rating, title, comment, status, created_at, customers(name), products(name)")
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data ?? []).map((r: any) => ({
     id: r.id,
     product_id: r.product_id,
     product_name: r.products?.name ?? "Unknown product",
-    customer_name: r.customer_name,
+    customer_name: r.customers?.name ?? "Guest",
     rating: r.rating,
     title: r.title,
     comment: r.comment,
@@ -251,7 +252,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
     fetchAdminReviews(),
   ]);
 
-  const paidStatuses: OrderStatus[] = ["ACCEPTED", "CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"];
+  const paidStatuses: OrderStatus[] = ["APPROVED", "PROCESSING", "SHIPPED", "DELIVERED"];
   const revenue = orders
     .filter((o) => paidStatuses.includes(o.status))
     .reduce((sum, o) => sum + o.grand_total, 0);
@@ -267,7 +268,7 @@ export async function fetchDashboardStats(): Promise<DashboardStats> {
 }
 
 async function fetchAllProductsCount(): Promise<number> {
-  if (!isSupabaseConfigured()) return sampleProducts.length;
+  if (!isSupabaseConfigured()) return demoProducts().length;
   const supabase = createServiceClient();
   const { count } = await supabase
     .from("products")

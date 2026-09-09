@@ -83,8 +83,8 @@ export function Navbar({ announcementBarText }: { announcementBarText?: string |
             )}
           </button>
           <Link
-            href="/admin/login"
-            aria-label="Profile"
+            href="/account"
+            aria-label="My Account"
             className="pl-xs flex items-center"
           >
             <span className="w-9 h-9 rounded-full bg-surface-container-high ring-1 ring-surface-variant flex items-center justify-center text-on-surface-variant">
@@ -119,6 +119,13 @@ export function Navbar({ announcementBarText }: { announcementBarText?: string |
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/account"
+            onClick={() => setMobileOpen(false)}
+            className={cn("block py-2.5 border-b border-surface-variant/60", isActive("/account") ? activeClass : idleClass)}
+          >
+            My Account
+          </Link>
         </nav>
       )}
     </header>

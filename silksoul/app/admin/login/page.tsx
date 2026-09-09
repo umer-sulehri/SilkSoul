@@ -15,14 +15,14 @@ export default async function AdminLoginPage() {
   if (admin) redirect("/admin");
 
   const demoMode = !isSupabaseConfigured();
-  const creds = demoMode ? demoCredentials() : null;
+  const creds = demoCredentials();
 
   return (
     <div className="min-h-screen flex items-center justify-center px-gutter-mobile py-3xl bg-surface-container-low">
       <LoginForm
         demoMode={demoMode}
-        demoEmail={creds?.email}
-        demoPassword={creds?.password}
+        demoEmail={creds.email}
+        demoPassword={creds.password}
       />
     </div>
   );

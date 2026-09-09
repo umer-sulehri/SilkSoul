@@ -104,7 +104,7 @@ types/                  # shared domain types + statuses
 2. Checkout posts an **order request** (`app/actions/orders.ts`): server re-validates
    prices against the DB, computes subtotal + delivery fee, generates an order number
    (`SSL-YYYYMMDD-NNNN`), inserts the order + items, and decrements stock.
-3. Admin reviews in `/admin/orders`, updates status (PENDING → ACCEPTED → SHIPPED →
+3. Admin reviews in `/admin/orders`, updates status (PENDING → APPROVED → SHIPPED →
    DELIVERED, or REJECTED/CANCELLED) and leaves internal notes.
 4. Support queries (`/contact`) and reviews are queued in `/admin/queries` and
    `/admin/reviews` for moderation.

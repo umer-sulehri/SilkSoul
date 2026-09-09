@@ -320,25 +320,49 @@ alter table public.collection_products enable row level security;
 alter table public.site_settings enable row level security;
 
 -- ---- PUBLIC READS (anon + authenticated) ----
+drop policy if exists "Public catalog read" on public.brands;
 create policy "Public catalog read" on public.brands for select using (true);
+
+drop policy if exists "Public catalog read" on public.categories;
 create policy "Public catalog read" on public.categories for select using (true);
+
+drop policy if exists "Public catalog read" on public.tags;
 create policy "Public catalog read" on public.tags for select using (true);
+
+drop policy if exists "Public catalog read" on public.products;
 create policy "Public catalog read" on public.products for select using (true);
+
+drop policy if exists "Public catalog read" on public.product_images;
 create policy "Public catalog read" on public.product_images for select using (true);
+
+drop policy if exists "Public catalog read" on public.product_tags;
 create policy "Public catalog read" on public.product_tags for select using (true);
+
+drop policy if exists "Public catalog read" on public.collections;
 create policy "Public catalog read" on public.collections for select using (true);
+
+drop policy if exists "Public catalog read" on public.collection_products;
 create policy "Public catalog read" on public.collection_products for select using (true);
+
+drop policy if exists "Public read" on public.site_settings;
 create policy "Public read" on public.site_settings for select using (true);
+
+drop policy if exists "Public approved reviews" on public.reviews;
 create policy "Public approved reviews" on public.reviews for select using (status = 'APPROVED');
 
 -- ---- ORDER REQUESTS: anyone can create ----
+drop policy if exists "Create order request" on public.orders;
 create policy "Create order request" on public.orders for insert with check (true);
+
+drop policy if exists "Create order items" on public.order_items;
 create policy "Create order items" on public.order_items for insert with check (true);
 
 -- ---- QUERIES: anyone can create ----
+drop policy if exists "Create query" on public.queries;
 create policy "Create query" on public.queries for insert with check (true);
 
 -- ---- CUSTOMERS: anyone can create ----
+drop policy if exists "Create customer" on public.customers;
 create policy "Create customer" on public.customers for insert with check (true);
 
 -- ---- ADMIN FULL ACCESS (role = ADMIN on the connected profile) ----
@@ -361,6 +385,7 @@ begin
     'site_settings'
   ]
   loop
+    execute format('drop policy if exists "Admin full access" on public.%I', policy_name);
     execute format(
       'create policy "Admin full access" on public.%I
        for all using (public.is_admin()) with check (public.is_admin())',
@@ -370,15 +395,19 @@ begin
 end $$;
 
 -- ---- USERS: can read/update their own order requests ----
+drop policy if exists "Read own orders" on public.orders;
 create policy "Read own orders" on public.orders
   for select using (auth.uid() = user_id);
 
+drop policy if exists "Read own profile" on public.profiles;
 create policy "Read own profile" on public.profiles
   for select using (auth.uid() = id);
 
+drop policy if exists "Update own profile" on public.profiles;
 create policy "Update own profile" on public.profiles
   for update using (auth.uid() = id) with check (auth.uid() = id);
 
 -- ---- REVIEWS: authenticated users can create ----
+drop policy if exists "Authenticated create review" on public.reviews;
 create policy "Authenticated create review" on public.reviews
   for insert with check (auth.uid() is not null);

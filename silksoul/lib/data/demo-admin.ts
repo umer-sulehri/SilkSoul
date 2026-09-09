@@ -118,7 +118,7 @@ export const demoOrders: DemoOrder[] = [
     subtotal: 3198,
     delivery_fee: 0,
     grand_total: 3198,
-    status: "ACCEPTED",
+    status: "APPROVED",
     admin_note: "Call customer to confirm quantities.",
     coupon_code: null,
     coupon_discount: 0,
@@ -169,6 +169,27 @@ export const demoOrders: DemoOrder[] = [
       item("oi-7", "ord-d4e5f6a7", HSER, "Nourishing Hair Serum", null, 1850, 1),
     ],
   },
+  {
+    id: "ord-demo-user",
+    order_number: "SSL-20260908-9001",
+    customer_name: "SilkSoul Demo User",
+    email: "user@silksoul.com",
+    phone: "+92 300 1112233",
+    address: "Demo House, Model Town",
+    city: "Lahore",
+    notes: "Sample order for the demo account.",
+    subtotal: 2998,
+    delivery_fee: 0,
+    grand_total: 2998,
+    status: "APPROVED",
+    admin_note: null,
+    coupon_code: null,
+    coupon_discount: 0,
+    created_at: "2026-09-08T13:05:00Z",
+    items: [
+      item("oi-8", "ord-demo-user", FW, "Anti-Acne Face Wash", null, 1499, 2),
+    ],
+  },
 ];
 
 export const demoQueries: DemoQuery[] = [
@@ -215,6 +236,17 @@ export const demoQueries: DemoQuery[] = [
     status: "RESOLVED",
     created_at: "2026-09-06T18:20:00Z",
   },
+  {
+    id: "q-5",
+    name: "SilkSoul Demo User",
+    email: "user@silksoul.com",
+    phone: "+92 300 1112233",
+    subject: "Refund policy",
+    message:
+      "Hi, could you confirm the return window for unopened products? I'd like to know before ordering another bottle.",
+    status: "RESOLVED",
+    created_at: "2026-09-07T11:40:00Z",
+  },
 ];
 
 export const demoCustomers: DemoCustomer[] = [
@@ -254,6 +286,18 @@ export const demoCustomers: DemoCustomer[] = [
     last_order_at: "2026-09-03T09:15:00Z",
     created_at: "2026-07-15T15:30:00Z",
   },
+  {
+    id: "cust-4",
+    name: "SilkSoul Demo User",
+    email: "user@silksoul.com",
+    phone: "+92 300 1112233",
+    city: "Lahore",
+    status: "ACTIVE",
+    total_orders: 1,
+    total_spent: 2998,
+    last_order_at: "2026-09-08T13:05:00Z",
+    created_at: "2026-08-01T09:00:00Z",
+  },
 ];
 
 export const demoReviews: {
@@ -288,5 +332,16 @@ export const demoReviews: {
     comment: "Controls oil much better than expected. Pores look smaller after three weeks.",
     status: "PENDING",
     created_at: "2026-09-07T13:55:00Z",
+  },
+  {
+    id: "rev-demo-user",
+    product_id: FW,
+    product_name: "Anti-Acne Face Wash",
+    customer_name: "user@silksoul.com",
+    rating: 5,
+    title: "My go-to cleanser",
+    comment: "Second order of the same product. Clears breakouts without over-drying.",
+    status: "APPROVED",
+    created_at: "2026-09-02T17:20:00Z",
   },
 ];

@@ -8,6 +8,7 @@ import { isSupabaseConfigured } from "@/lib/data/loader";
 import {
   ADMIN_COOKIE,
   createDemoSession,
+  demoCredentials,
   matchesDemoCredentials,
 } from "@/lib/demo-auth";
 
@@ -25,6 +26,7 @@ export async function signInAdmin(
   }
 
   if (!isSupabaseConfigured()) {
+    console.log("[auth] demo mode (Supabase env incomplete)");
     if (!matchesDemoCredentials(parsed.data.email, parsed.data.password)) {
       return { success: false, error: "Invalid email or password." };
     }
@@ -43,6 +45,10 @@ export async function signInAdmin(
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error || !data.user) {
+    console.log(
+      "[auth] supabase sign-in failed:",
+      JSON.stringify({ message: error?.message, status: error?.status, code: error?.code }),
+    );
     return { success: false, error: error?.message ?? "Unable to sign in" };
   }
 
@@ -60,19 +66,37 @@ export async function signInAdmin(
   redirect("/admin");
 }
 
+export async function signInDemo(
+  email: string,
+): Promise<{ success: boolean; error?: string }> {
+  const demo = demoCredentials();
+  if (email.trim().toLowerCase() !== demo.email.toLowerCase()) {
+    return { success: false, error: "Invalid demo email." };
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(ADMIN_COOKIE, createDemoSession(demo.email), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
+  redirect("/admin");
+}
+
 export async function signOutAdmin() {
+  const cookieStore = await cookies();
+  cookieStore.set(ADMIN_COOKIE, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
     await supabase.auth.signOut();
-  } else {
-    const cookieStore = await cookies();
-    cookieStore.set(ADMIN_COOKIE, "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 0,
-    });
   }
   redirect("/admin/login");
 }

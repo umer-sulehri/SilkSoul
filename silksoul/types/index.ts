@@ -1,29 +1,23 @@
 export const ORDER_STATUSES = [
   "PENDING",
-  "UNDER_REVIEW",
-  "ACCEPTED",
-  "CONFIRMED",
+  "APPROVED",
   "PROCESSING",
   "SHIPPED",
   "DELIVERED",
   "REJECTED",
   "CANCELLED",
-  "RETURNED",
 ] as const;
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   PENDING: "Pending",
-  UNDER_REVIEW: "Under Review",
-  ACCEPTED: "Accepted",
-  CONFIRMED: "Confirmed",
+  APPROVED: "Approved",
   PROCESSING: "Processing",
   SHIPPED: "Shipped",
   DELIVERED: "Delivered",
   REJECTED: "Rejected",
   CANCELLED: "Cancelled",
-  RETURNED: "Returned",
 };
 
 export const PRODUCT_STATUSES = ["DRAFT", "PUBLISHED", "ARCHIVED"] as const;

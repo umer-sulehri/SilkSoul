@@ -12,6 +12,11 @@ export type AdminUser = {
 };
 
 export const getAdminUser = cache(async (): Promise<AdminUser | null> => {
+  const demoEmail = readDemoSession((await cookies()).get(ADMIN_COOKIE)?.value);
+  if (demoEmail) {
+    return { user: { id: "demo-admin", email: demoEmail }, role: "ADMIN", demo: true };
+  }
+
   if (isSupabaseConfigured()) {
     const supabase = await createClient();
     const {
@@ -33,9 +38,7 @@ export const getAdminUser = cache(async (): Promise<AdminUser | null> => {
     };
   }
 
-  const email = readDemoSession((await cookies()).get(ADMIN_COOKIE)?.value);
-  if (!email) return null;
-  return { user: { id: "demo-admin", email }, role: "ADMIN", demo: true };
+  return null;
 });
 
 export async function requireAdmin(): Promise<AdminUser> {

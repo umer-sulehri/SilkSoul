@@ -3,6 +3,14 @@ import { cookies } from "next/headers";
 
 export async function createClient() {
   const cookieStore = await cookies();
+  console.log(
+    "[supabase-server] host=",
+    process.env.NEXT_PUBLIC_SUPABASE_URL
+      ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).host
+      : "(missing URL)",
+    "anonKey=",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "set" : "(missing)",
+  );
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

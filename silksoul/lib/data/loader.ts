@@ -6,6 +6,13 @@ import {
   sampleReviews,
   sampleSiteSettings,
 } from "./sample-data";
+import {
+  demoAdminReviews,
+  demoCustomers,
+  demoOrders,
+  demoProducts,
+  demoQueries,
+} from "./demo-store";
 import { createServiceClient } from "@/lib/supabase/service";
 import type {
   Brand,
@@ -65,7 +72,7 @@ export async function fetchProducts(options?: {
   sort?: string;
 }): Promise<ProductWithRelations[]> {
   if (!isSupabaseConfigured()) {
-    let products = [...sampleProducts];
+    let products = [...demoProducts()];
     const { status, featured, bestSeller, newArrival, categorySlug, brandSlug, search, sort } =
       options ?? {};
     if (status) products = products.filter((p) => p.status === status);
@@ -113,7 +120,7 @@ export async function fetchProducts(options?: {
 
 export async function fetchProductBySlug(slug: string): Promise<ProductWithRelations | null> {
   if (!isSupabaseConfigured()) {
-    return sampleProducts.find((p) => p.slug === slug) ?? null;
+    return demoProducts().find((p) => p.slug === slug) ?? null;
   }
 
   const supabase = createServiceClient();
@@ -129,7 +136,7 @@ export async function fetchProductBySlug(slug: string): Promise<ProductWithRelat
 
 export async function fetchProductById(id: string): Promise<ProductWithRelations | null> {
   if (!isSupabaseConfigured()) {
-    return sampleProducts.find((p) => p.id === id) ?? null;
+    return demoProducts().find((p) => p.id === id) ?? null;
   }
   const supabase = createServiceClient();
   const { data, error } = await supabase
@@ -194,7 +201,7 @@ export async function fetchCollectionProducts(slug: string): Promise<ProductWith
         ["acne-care", ["prod-face-wash", "prod-niacinamide", "prod-cleanser"]],
       ].find(([s]) => s === slug)?.[1] ?? [],
     );
-    return sampleProducts.filter((p) => productIds.has(p.id));
+    return demoProducts().filter((p) => productIds.has(p.id));
   }
   const supabase = createServiceClient();
   const { data } = await supabase
@@ -259,9 +266,88 @@ export async function fetchSiteSettings(): Promise<SiteSettings> {
   };
 }
 
+export async function fetchOrdersByEmail(
+  email: string,
+): Promise<any[]> {
+  if (!isSupabaseConfigured()) {
+    return demoOrders()
+      .filter((o) => o.email.toLowerCase() === email.toLowerCase())
+      .sort((a, b) => (b.created_at > a.created_at ? 1 : -1));
+  }
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select(
+      `id, order_number, customer_name, email, status, grand_total, subtotal, delivery_fee,
+       created_at, order_items (product_name, product_image, unit_price, quantity, line_total)`,
+    )
+    .ilike("email", email)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function fetchQueriesByEmail(email: string): Promise<any[]> {
+  if (!isSupabaseConfigured()) {
+    return demoQueries()
+      .filter((q) => q.email.toLowerCase() === email.toLowerCase())
+      .sort((a, b) => (b.created_at > a.created_at ? 1 : -1));
+  }
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("queries")
+    .select("id, subject, message, status, created_at")
+    .ilike("email", email)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function fetchCustomerByEmail(
+  email: string,
+): Promise<{ id: string; name: string; email: string; phone: string | null; city: string | null; created_at: string } | null> {
+  if (!isSupabaseConfigured()) {
+    return demoCustomers().find((c) => c.email.toLowerCase() === email.toLowerCase()) ?? null;
+  }
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("customers")
+    .select("id, name, email, phone, city, created_at")
+    .ilike("email", email)
+    .maybeSingle();
+  return data ?? null;
+}
+
+export async function fetchReviewsByEmail(
+  email: string,
+): Promise<Array<Review & { product_name?: string }>> {
+  if (!isSupabaseConfigured()) {
+    return demoAdminReviews()
+      .filter((r) => r.customer_name.toLowerCase() === email.toLowerCase())
+      .sort((a, b) => (b.created_at > a.created_at ? 1 : -1));
+  }
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("reviews")
+    .select("id, product_id, rating, title, comment, status, created_at, customers(name), products(name)")
+    .filter("customers.email", "eq", email)
+    .order("created_at", { ascending: false });
+  return (data ?? []).map((r: any) => ({
+    id: r.id,
+    product_id: r.product_id,
+    product_name: r.products?.name ?? "Unknown product",
+    customer_name: r.customers?.name ?? "Guest",
+    rating: r.rating,
+    title: r.title,
+    comment: r.comment,
+    status: r.status,
+    created_at: r.created_at,
+  }));
+}
+
 export async function fetchAllProductsAdmin(): Promise<any[]> {
   if (!isSupabaseConfigured()) {
-    return sampleProducts.map((p) => ({
+    return demoProducts().map((p) => ({
       id: p.id,
       name: p.name,
       slug: p.slug,
